@@ -1,0 +1,4 @@
+id,image_path,material,size_mm,process,base_price,style,category,quantity,urgent,region
+SKU001,data/raw/images/0001.jpg,metal+glass,600,paint,399,modern,pendant,1,false,east
+SKU002,data/raw/images/0002.jpg,metal,450,plating,259,minimal,ceiling,1,false,south
+SKU003,data/raw/images/0003.jpg,glass,500,brushed,329,light-luxury,pendant,1,true,north

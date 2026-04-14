@@ -1,0 +1,29 @@
+{
+  "image_path": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\raw\\SKU-BRASS-WALL-L.png",
+  "width": 512,
+  "height": 512,
+  "sam3_backend": "sam3-threshold-placeholder",
+  "is_placeholder_backend": true,
+  "prompt": "lamp",
+  "objects": [
+    {
+      "category": "lamp",
+      "bbox_xyxy": [
+        119,
+        136,
+        410,
+        420
+      ],
+      "sam3_score": 0.0,
+      "review_status": "approved",
+      "review_note": "synthetic sample auto-approved",
+      "reviewer": "system-sample-generator",
+      "reviewed_at": "2026-04-03T03:28:07.630255+00:00",
+      "mask_path": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\annotations\\masks\\SKU-BRASS-WALL-L.png"
+    }
+  ],
+  "backend_errors": [
+    "official: sam3 package not installed in current runtime",
+    "bridge: SAM3 bridge python_executable is not configured"
+  ]
+}

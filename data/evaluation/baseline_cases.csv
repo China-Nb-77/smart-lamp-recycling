@@ -1,0 +1,10 @@
+case_id,split,query_image,expected_sku_id,expected_bbox_xyxy,expected_quote,expected_material,expected_size_band,expected_craft,expected_risk_level,detector_version,index_version,pricing_version
+SKU-ALU-PENDANT-S_query,train,data\queries\SKU-ALU-PENDANT-S_query.png,SKU-ALU-PENDANT-S,"[166, 128, 346, 322]",181.58,aluminum,S,matte,low,rtdetr-lamp,catalog-v1,rule-v1
+SKU-ALU-PENDANT-S_query_v1,train,data\queries\SKU-ALU-PENDANT-S_query_v1.png,SKU-ALU-PENDANT-S,"[176, 124, 356, 318]",177.58,aluminum,S,matte,low,rtdetr-lamp,catalog-v1,rule-v1
+SKU-ALU-PENDANT-S_query_v2,test,data\queries\SKU-ALU-PENDANT-S_query_v2.png,SKU-ALU-PENDANT-S,"[154, 132, 334, 326]",183.08,aluminum,S,matte,low,rtdetr-lamp,catalog-v1,rule-v1
+SKU-GLASS-FLOOR-M_query,train,data\queries\SKU-GLASS-FLOOR-M_query.png,SKU-GLASS-FLOOR-M,"[181, 116, 351, 387]",443.09,glass,M,frosted,medium,rtdetr-lamp,catalog-v1,rule-v1
+SKU-GLASS-FLOOR-M_query_v1,train,data\queries\SKU-GLASS-FLOOR-M_query_v1.png,SKU-GLASS-FLOOR-M,"[191, 127, 361, 398]",439.09,glass,M,frosted,medium,rtdetr-lamp,catalog-v1,rule-v1
+SKU-GLASS-FLOOR-M_query_v2,test,data\queries\SKU-GLASS-FLOOR-M_query_v2.png,SKU-GLASS-FLOOR-M,"[169, 113, 339, 384]",444.59,glass,M,frosted,medium,rtdetr-lamp,catalog-v1,rule-v1
+SKU-BRASS-WALL-L_query,train,data\queries\SKU-BRASS-WALL-L_query.png,SKU-BRASS-WALL-L,"[123, 145, 399, 333]",846.01,brass,L,premium-handmade,medium,rtdetr-lamp,catalog-v1,rule-v1
+SKU-BRASS-WALL-L_query_v1,train,data\queries\SKU-BRASS-WALL-L_query_v1.png,SKU-BRASS-WALL-L,"[133, 131, 409, 319]",842.01,brass,L,premium-handmade,medium,rtdetr-lamp,catalog-v1,rule-v1
+SKU-BRASS-WALL-L_query_v2,test,data\queries\SKU-BRASS-WALL-L_query_v2.png,SKU-BRASS-WALL-L,"[111, 145, 387, 333]",847.51,brass,L,premium-handmade,medium,rtdetr-lamp,catalog-v1,rule-v1

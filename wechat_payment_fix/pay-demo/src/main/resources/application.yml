@@ -1,0 +1,44 @@
+﻿spring:
+  datasource:
+    url: jdbc:h2:mem:pay_demo_patch;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  address: 0.0.0.0
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+
+app:
+  public-access:
+    access-domain: ${PUBLIC_ACCESS_DOMAIN:https://pay-demo.example.com}
+  upload:
+    storage-dir: ${UPLOAD_STORAGE_DIR:uploads}
+    public-path: /uploads
+
+wechat:
+  pay:
+    enabled: ${WECHAT_PAY_ENABLED:false}
+    merchant-id: ${WECHAT_PAY_MERCHANT_ID:}
+    app-id: ${WECHAT_PAY_APP_ID:}
+    merchant-serial-number: ${WECHAT_PAY_MERCHANT_SERIAL_NUMBER:}
+    private-key-path: ${WECHAT_PAY_PRIVATE_KEY_PATH:}
+    api-v3-key: ${WECHAT_PAY_API_V3_KEY:}
+    notify-url: ${WECHAT_PAY_NOTIFY_URL:}
+    h5-app-name: ${WECHAT_PAY_H5_APP_NAME:AI Light Assistant}
+    h5-app-url: ${WECHAT_PAY_H5_APP_URL:https://pay-demo.example.com}
+    default-payer-client-ip: ${WECHAT_PAY_DEFAULT_CLIENT_IP:127.0.0.1}
+    order-expire-minutes: ${WECHAT_PAY_ORDER_EXPIRE_MINUTES:10}
+    allow-unsafe-local-notify: ${WECHAT_PAY_ALLOW_UNSAFE_LOCAL_NOTIFY:false}

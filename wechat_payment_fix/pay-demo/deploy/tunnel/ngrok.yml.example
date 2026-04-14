@@ -1,0 +1,7 @@
+version: 2
+authtoken: YOUR_NGROK_AUTHTOKEN
+tunnels:
+  pay-demo:
+    proto: http
+    addr: 8080
+    domain: pay-demo.example.com

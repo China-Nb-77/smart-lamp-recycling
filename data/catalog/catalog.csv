@@ -1,0 +1,4 @@
+sku_id,title,image_path,visual_style,material,size_band,craft,base_price,risk_level,width_mm,height_mm
+SKU-ALU-PENDANT-S,Aluminum Pendant S,images/27ef8b317e0f9663.jpg,pendant,aluminum,S,matte,199,low,280,220
+SKU-GLASS-FLOOR-M,Glass Floor M,data/catalog/images/SKU-GLASS-FLOOR-M.png,floor,glass,M,frosted,329,medium,360,480
+SKU-BRASS-WALL-L,Brass Wall L,data/catalog/images/SKU-BRASS-WALL-L.png,wall,brass,L,premium-handmade,459,medium,420,300

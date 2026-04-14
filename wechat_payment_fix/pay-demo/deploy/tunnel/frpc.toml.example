@@ -1,0 +1,9 @@
+serverAddr = "your-frps.example.com"
+serverPort = 7000
+
+[[proxies]]
+name = "pay-demo-8080"
+type = "http"
+localIP = "127.0.0.1"
+localPort = 8080
+customDomains = ["pay-demo.example.com"]
