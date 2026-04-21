@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>智能选灯助手 APK 下载</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6efe2;
+        --surface: rgba(255, 251, 245, 0.88);
+        --surface-strong: rgba(255, 255, 255, 0.94);
+        --text: #1e1d18;
+        --muted: #6c665b;
+        --brand: #1d6a57;
+        --brand-dark: #154e41;
+        --accent: #b56a2b;
+        --line: rgba(34, 32, 24, 0.1);
+        --shadow: 0 22px 48px rgba(76, 48, 12, 0.14);
+        --radius-lg: 28px;
+        --radius-md: 20px;
+        --radius-sm: 14px;
+        --font-stack: "Avenir Next", "PingFang SC", "Noto Sans SC",
+          "Microsoft YaHei", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        font-family: var(--font-stack);
+        color: var(--text);
+        background:
+          radial-gradient(circle at top right, rgba(255, 255, 255, 0.85), transparent 32%),
+          linear-gradient(160deg, #f6efe2 0%, #eed8b8 52%, #e7d4b7 100%);
+      }
+
+      body {
+        padding: 18px 14px 28px;
+      }
+
+      .shell {
+        width: min(100%, 720px);
+        margin: 0 auto;
+      }
+
+      .hero,
+      .panel {
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+      }
+
+      .hero {
+        padding: 26px 22px;
+        margin-bottom: 16px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 9px 14px;
+        border-radius: 999px;
+        background: rgba(29, 106, 87, 0.1);
+        color: var(--brand-dark);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .hero h1 {
+        margin-top: 14px;
+        font-size: clamp(30px, 8vw, 46px);
+        line-height: 1.06;
+      }
+
+      .hero p {
+        margin-top: 10px;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .download-card {
+        display: grid;
+        gap: 18px;
+      }
+
+      .download-link {
+        display: block;
+        width: 100%;
+        padding: 16px 18px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--brand) 0%, #2e826d 100%);
+        color: #fff;
+        text-align: center;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .meta-list,
+      .steps {
+        display: grid;
+        gap: 10px;
+      }
+
+      .meta-row,
+      .step {
+        padding: 14px 15px;
+        border-radius: var(--radius-md);
+        background: var(--surface-strong);
+        border: 1px solid var(--line);
+      }
+
+      .meta-label,
+      .step-label {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .meta-value {
+        word-break: break-all;
+        font-weight: 700;
+      }
+
+      .qr-wrap {
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--line);
+      }
+
+      .qr-wrap img {
+        width: min(100%, 220px);
+        height: auto;
+        display: block;
+      }
+
+      .tips {
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .tips strong {
+        color: var(--accent);
+      }
+
+      @media (min-width: 760px) {
+        body {
+          padding-top: 28px;
+        }
+
+        .grid {
+          grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <span class="pill">Smart Lamp Assistant</span>
+        <h1>智能选灯助手 APK 下载页</h1>
+        <p>
+          当前页面会自动读取你访问的服务器地址，生成 APK 直链和二维码。手机打开后可以直接下载安装。
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="panel download-card">
+          <div>
+            <h2>直接下载</h2>
+            <p class="tips">推荐先点击按钮下载，如果微信内打开，请复制链接到系统浏览器。</p>
+          </div>
+
+          <a id="downloadLink" class="download-link" href="#">下载 SmartLampAssistant.apk</a>
+
+          <div class="meta-list">
+            <div class="meta-row">
+              <span class="meta-label">APK 地址</span>
+              <span id="apkUrlText" class="meta-value"></span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">后端 API 根地址</span>
+              <span id="apiUrlText" class="meta-value"></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>扫码下载</h2>
+          <p class="tips" style="margin-top: 8px">二维码指向当前服务器上的 APK 文件地址。</p>
+          <div class="qr-wrap" style="margin-top: 18px">
+            <img id="qrImage" alt="APK 下载二维码" />
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" style="margin-top: 16px">
+        <h2>安装说明</h2>
+        <div class="steps" style="margin-top: 16px">
+          <div class="step">
+            <span class="step-label">1. 下载 APK</span>
+            <div>点击上方按钮，或用手机扫码下载 `SmartLampAssistant.apk`。</div>
+          </div>
+          <div class="step">
+            <span class="step-label">2. 允许安装未知应用</span>
+            <div>如果系统提示风险，请在浏览器或文件管理器里开启“允许安装未知来源应用”。</div>
+          </div>
+          <div class="step">
+            <span class="step-label">3. 安装并打开</span>
+            <div>APK 已经内置仓库里的最新 React 前端，打开后会直接请求当前服务器上的后端 API。</div>
+          </div>
+          <div class="step">
+            <span class="step-label">4. 网络要求</span>
+            <div>请确保服务器的 80 端口可访问，前端接口和下载链接都通过当前站点地址提供。</div>
+          </div>
+        </div>
+        <p class="tips" style="margin-top: 18px">
+          <strong>提示：</strong> 如果页面能打开但 APK 无法安装，优先检查文件是否完整上传；如果 APK 能打开但请求失败，优先检查阿里云安全组和 Nginx 反向代理是否生效。
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const origin = window.location.origin;
+      const apkUrl = `${origin}/SmartLampAssistant.apk`;
+      const qrUrl =
+        "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=" +
+        encodeURIComponent(apkUrl);
+
+      document.getElementById("downloadLink").href = apkUrl;
+      document.getElementById("apkUrlText").textContent = apkUrl;
+      document.getElementById("apiUrlText").textContent = origin;
+      document.getElementById("qrImage").src = qrUrl;
+    </script>
+  </body>
+</html>

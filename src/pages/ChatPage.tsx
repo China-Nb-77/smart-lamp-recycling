@@ -14,6 +14,7 @@ import {
   setCurrentSessionId,
   upsertSession,
 } from '../modules/history/services/session-service';
+import { getStoredUser } from '../auth/session';
 import { agentApi } from '../services/agentApi';
 import { buildVisionImageUrl } from '../services/visionApi';
 import type { AgentConversationResponse } from '../types/agent';
@@ -37,7 +38,6 @@ export function ChatPage() {
   const [inputValue, setInputValue] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [notice, setNotice] = useState('');
-  const [userLabel] = useState('鐢ㄦ埛');
   const [uploadingQuote, setUploadingQuote] = useState(false);
   const [preferenceSubmitting, setPreferenceSubmitting] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -86,6 +86,10 @@ export function ChatPage() {
 
   const currentSession =
     sessions.find((session) => session.id === currentSessionId) || sessions[0];
+  const userLabel = useMemo(() => {
+    const user = getStoredUser();
+    return user?.displayName || user?.realName || user?.username || '用户';
+  }, []);
 
   function patchSession(sessionId: string, updater: (session: ChatSession) => ChatSession) {
     setSessions((collection) => {
@@ -154,7 +158,7 @@ export function ChatPage() {
                     type: 'uploaded_image' as const,
                     data: {
                       image_url: buildVisionImageUrl(storedPath),
-                      alt: 'Uploaded old lamp image',
+                      alt: '已上传的旧灯图片',
                     },
                   },
                 ];
@@ -257,7 +261,7 @@ export function ChatPage() {
             type: 'uploaded_image',
             data: {
               image_url: localPreviewUrl,
-              alt: 'Uploaded old lamp image',
+              alt: '已上传的旧灯图片',
             },
           },
         ],
@@ -293,9 +297,9 @@ export function ChatPage() {
           message.id === loadingMessageId
             ? {
                 ...message,
-                text: 'Image recognition failed. Please check backend service.',
+                text: '图片识别失败，请检查后端服务。',
                 status: 'error',
-                error_message: error instanceof Error ? error.message : '鍥剧墖璇嗗埆澶辫触',
+                error_message: error instanceof Error ? error.message : '图片识别失败',
               }
             : message,
         ),
@@ -359,9 +363,9 @@ export function ChatPage() {
           message.id === loadingMessageId
             ? {
                 ...message,
-                text: 'Request failed. Please check backend service.',
+                text: '请求失败，请检查后端服务。',
                 status: 'error',
-                error_message: error instanceof Error ? error.message : '璇锋眰澶辫触',
+                error_message: error instanceof Error ? error.message : '请求失败',
                 retry_action: {
                   kind: 'ask',
                   payload: {
@@ -379,7 +383,7 @@ export function ChatPage() {
   function handleVoiceAction() {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Recognition) {
-      setNotice('褰撳墠娴忚鍣ㄤ笉鏀寔璇煶璇嗗埆');
+      setNotice('当前浏览器不支持语音识别');
       return;
     }
 
@@ -403,7 +407,7 @@ export function ChatPage() {
       setInputValue(transcript);
     };
     recognition.onerror = () => {
-      setNotice('璇煶璇嗗埆澶辫触');
+      setNotice('语音识别失败');
       setIsListening(false);
     };
     recognition.onend = () => {
@@ -425,15 +429,15 @@ export function ChatPage() {
   }
 
   function handleJoinLampContext(lamp: LampInfo) {
-    void sendQuestion(`璇峰熀浜?${lamp.name} 缁х画缁欏嚭寤鸿`);
+    void sendQuestion(`请基于 ${lamp.name} 继续给出建议`);
   }
 
   function handleQuickPrompt(prompt: string) {
-    if (prompt.includes('鎷嶇収')) {
+    if (prompt.includes('拍照')) {
       openCameraPicker();
       return;
     }
-    if (prompt.includes('鐩稿唽')) {
+    if (prompt.includes('相册')) {
       openGalleryPicker();
       return;
     }
@@ -488,7 +492,7 @@ export function ChatPage() {
           ],
         }));
       } catch (error) {
-        setNotice(error instanceof Error ? error.message : '??????');
+        setNotice(error instanceof Error ? error.message : '操作失败，请稍后重试');
       }
     })();
   }
@@ -530,9 +534,9 @@ export function ChatPage() {
           message.id === loadingMessageId
             ? {
                 ...message,
-                text: '鎻愪氦澶辫触锛岃绋嶅悗鍐嶈瘯',
+                text: '提交失败，请稍后再试',
                 status: 'error',
-                error_message: error instanceof Error ? error.message : '鎻愪氦澶辫触',
+                error_message: error instanceof Error ? error.message : '提交失败',
                 retry_action: {
                   kind: 'ask',
                   payload: {
@@ -588,7 +592,7 @@ export function ChatPage() {
               )
             }
             onAdvanceWaybill={() => {
-              setNotice('Check logistics status in electronic order page.');
+              setNotice('请在电子货单页查看物流状态');
             }}
             onOpenTicket={() => {
               setNotice('异常工单入口暂未启用');
@@ -661,19 +665,19 @@ function createMessage(
 function formatPreferenceSummary(payload: PreferenceFormSubmission) {
   const parts: string[] = [];
   if (payload.space) {
-    parts.push(`Space: ${payload.space}`);
+    parts.push(`安装空间：${payload.space}`);
   }
   if (payload.budget_level) {
-    parts.push(`Budget: ${payload.budget_level}`);
+    parts.push(`预算偏好：${payload.budget_level}`);
   }
   if (payload.install_type) {
-    parts.push(`Install type: ${payload.install_type}`);
+    parts.push(`灯具类型：${payload.install_type}`);
   }
   if (payload.note) {
-    parts.push(`Note: ${payload.note}`);
+    parts.push(`备注：${payload.note}`);
   }
   if (parts.length === 0) {
-    parts.push('Space, budget and install preference');
+    parts.push('请根据我填写的空间、预算和灯具类型推荐方案');
   }
   return parts.join('\n');
 }
@@ -683,7 +687,7 @@ function buildSuggestions(_cards: ChatCard[]) {
 }
 
 function isCheckoutPrompt(text: string) {
-  return ['涓嬪崟', '濉啓', '鏀惰揣淇℃伅', '涓汉淇℃伅', '鏀粯'].some((keyword) =>
+  return ['下单', '填写', '收货信息', '个人信息', '支付'].some((keyword) =>
     text.includes(keyword),
   );
 }

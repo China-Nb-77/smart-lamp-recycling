@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#f4ecde" />
+    <title>智能选灯助手</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="page-glow page-glow-a"></div>
+    <div class="page-glow page-glow-b"></div>
+
+    <div class="app-shell">
+      <section class="screen login-screen" id="loginScreen">
+        <div class="brand-pill">Smart Lamp Assistant</div>
+        <h1>智能选灯助手</h1>
+        <p class="screen-copy">
+          纯本地下单演示，适合直接封装成 Android APK，并通过阿里云页面分发。
+        </p>
+
+        <form id="loginForm" class="panel form-panel">
+          <div class="panel-heading">
+            <p class="eyebrow">快速登录</p>
+            <h2>30 秒进入选灯流程</h2>
+          </div>
+
+          <label class="field">
+            <span>昵称</span>
+            <input
+              id="nicknameInput"
+              name="nickname"
+              type="text"
+              maxlength="20"
+              placeholder="例如：王女士"
+              required
+            />
+          </label>
+
+          <label class="field">
+            <span>手机号</span>
+            <input
+              id="phoneInput"
+              name="phone"
+              type="tel"
+              inputmode="numeric"
+              maxlength="11"
+              placeholder="例如：13800138000"
+              required
+            />
+          </label>
+
+          <button class="primary-button" type="submit">进入助手</button>
+        </form>
+      </section>
+
+      <section class="screen app-screen hidden" id="appScreen">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">本地离线演示</p>
+            <h2>欢迎回来，<span id="welcomeName">灯光体验官</span></h2>
+          </div>
+
+          <button id="profileButton" class="profile-trigger" type="button">
+            <span id="profileButtonAvatar" class="avatar-badge">灯</span>
+            <span>个人中心</span>
+          </button>
+        </header>
+
+        <main class="content">
+          <section class="hero-card panel">
+            <div>
+              <p class="eyebrow">今日精选</p>
+              <h3>两款热门灯具已准备好，点一下就能直接下单</h3>
+            </div>
+            <div class="hero-tags">
+              <span>Aluminum Pendant S</span>
+              <span>Glass Floor M</span>
+              <span>localStorage 存储</span>
+            </div>
+          </section>
+
+          <section class="section-head">
+            <div>
+              <p class="eyebrow">推荐卡片</p>
+              <h3>点击“选这个”立即弹出下单卡片</h3>
+            </div>
+          </section>
+
+          <section class="product-grid">
+            <article class="product-card panel">
+              <div class="product-topline">
+                <span class="sku-chip">SKU-ALU-PENDANT-S</span>
+                <span class="price-chip">¥199</span>
+              </div>
+              <h3>Aluminum Pendant S</h3>
+              <p class="product-copy">
+                轻量铝制吊灯，适合餐桌、岛台与小型会客区，色温柔和，安装占地更小。
+              </p>
+              <ul class="feature-list">
+                <li>规格：Small</li>
+                <li>材质：Aluminum</li>
+                <li>风格：极简悬挂</li>
+              </ul>
+              <button
+                class="primary-button choose-button"
+                type="button"
+                data-product-id="alu-pendant-s"
+              >
+                选这个
+              </button>
+            </article>
+
+            <article class="product-card panel accent-card">
+              <div class="product-topline">
+                <span class="sku-chip">SKU-GLASS-FLOOR-M</span>
+                <span class="price-chip">¥329</span>
+              </div>
+              <h3>Glass Floor M</h3>
+              <p class="product-copy">
+                磨砂玻璃落地灯，适合客厅阅读角和展示空间，亮度层次更丰富。
+              </p>
+              <ul class="feature-list">
+                <li>规格：Medium</li>
+                <li>材质：Glass</li>
+                <li>风格：落地氛围照明</li>
+              </ul>
+              <button
+                class="primary-button choose-button"
+                type="button"
+                data-product-id="glass-floor-m"
+              >
+                选这个
+              </button>
+            </article>
+          </section>
+
+          <section class="panel history-panel">
+            <div class="section-head compact-head">
+              <div>
+                <p class="eyebrow">最近订单</p>
+                <h3>提交后会立即保存到本机</h3>
+              </div>
+            </div>
+
+            <div id="orderEmptyState" class="empty-state">
+              还没有订单，先从上面的推荐卡片里选一个吧。
+            </div>
+            <div id="orderList" class="order-list"></div>
+          </section>
+        </main>
+      </section>
+    </div>
+
+    <div id="sheetBackdrop" class="sheet-backdrop"></div>
+
+    <aside id="orderSheet" class="sheet" aria-hidden="true">
+      <form id="orderForm" class="sheet-inner">
+        <div class="sheet-header">
+          <div>
+            <p class="eyebrow">立即下单</p>
+            <h3 id="orderProductName">Aluminum Pendant S</h3>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-close-sheet="order"
+            aria-label="关闭下单卡片"
+          >
+            关闭
+          </button>
+        </div>
+
+        <section class="sheet-block emphasis-block">
+          <p id="orderProductMeta" class="meta-line">SKU-ALU-PENDANT-S · Small</p>
+          <div class="price-line">
+            <span>单价</span>
+            <strong id="orderUnitPrice">¥199</strong>
+          </div>
+        </section>
+
+        <section class="sheet-block">
+          <div class="block-title">
+            <h4>数量选择</h4>
+            <span>1 - 9 件</span>
+          </div>
+          <div class="quantity-control">
+            <button id="decreaseQuantity" class="step-button" type="button">
+              -
+            </button>
+            <input
+              id="quantityInput"
+              type="number"
+              min="1"
+              max="9"
+              value="1"
+              inputmode="numeric"
+            />
+            <button id="increaseQuantity" class="step-button" type="button">
+              +
+            </button>
+          </div>
+        </section>
+
+        <section class="sheet-block">
+          <div class="block-title">
+            <h4>地址选择</h4>
+            <button id="manageAddressButton" class="text-button" type="button">
+              管理地址
+            </button>
+          </div>
+          <label class="field">
+            <span>收货地址</span>
+            <select id="addressSelect" required></select>
+          </label>
+        </section>
+
+        <section class="sheet-block">
+          <label class="field">
+            <span>备注</span>
+            <textarea
+              id="orderNote"
+              rows="3"
+              maxlength="80"
+              placeholder="例如：晚 8 点后配送，提前电话联系"
+            ></textarea>
+          </label>
+        </section>
+
+        <div class="total-row">
+          <span>合计</span>
+          <strong id="orderTotal">¥199</strong>
+        </div>
+
+        <button class="primary-button" type="submit">提交订单</button>
+      </form>
+    </aside>
+
+    <aside id="profileSheet" class="sheet" aria-hidden="true">
+      <div class="sheet-inner profile-sheet-inner">
+        <div class="sheet-header">
+          <div>
+            <p class="eyebrow">个人中心</p>
+            <h3>用户信息与地址管理</h3>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-close-sheet="profile"
+            aria-label="关闭个人中心"
+          >
+            关闭
+          </button>
+        </div>
+
+        <section class="sheet-block profile-summary">
+          <div id="profileAvatar" class="profile-avatar">灯</div>
+          <div>
+            <h4 id="profileNameDisplay">灯光体验官</h4>
+            <p id="profilePhoneDisplay">13800138000</p>
+          </div>
+        </section>
+
+        <section class="stats-row">
+          <article class="stat-card">
+            <span>订单数</span>
+            <strong id="orderCountStat">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>地址数</span>
+            <strong id="addressCountStat">0</strong>
+          </article>
+        </section>
+
+        <section class="sheet-block">
+          <div class="block-title">
+            <h4>地址管理</h4>
+            <span>默认地址可直接用于下单</span>
+          </div>
+          <div id="addressList" class="address-list"></div>
+        </section>
+
+        <form id="addressForm" class="sheet-block address-form">
+          <input id="addressIdInput" type="hidden" />
+
+          <label class="field">
+            <span>地址标签</span>
+            <input
+              id="addressLabelInput"
+              type="text"
+              maxlength="12"
+              placeholder="例如：公司 / 家里"
+              required
+            />
+          </label>
+
+          <label class="field">
+            <span>收货人</span>
+            <input
+              id="recipientInput"
+              type="text"
+              maxlength="20"
+              placeholder="例如：王女士"
+              required
+            />
+          </label>
+
+          <label class="field">
+            <span>联系电话</span>
+            <input
+              id="addressPhoneInput"
+              type="tel"
+              maxlength="11"
+              inputmode="numeric"
+              placeholder="例如：13800138000"
+              required
+            />
+          </label>
+
+          <label class="field">
+            <span>详细地址</span>
+            <textarea
+              id="addressDetailInput"
+              rows="3"
+              maxlength="80"
+              placeholder="例如：上海市浦东新区世纪大道 100 号 18F"
+              required
+            ></textarea>
+          </label>
+
+          <label class="checkbox-row">
+            <input id="addressDefaultInput" type="checkbox" />
+            <span>设为默认地址</span>
+          </label>
+
+          <div class="form-actions">
+            <button class="primary-button" type="submit">保存地址</button>
+            <button
+              id="resetAddressButton"
+              class="secondary-button"
+              type="button"
+            >
+              新建地址
+            </button>
+          </div>
+        </form>
+
+        <button id="logoutButton" class="ghost-danger" type="button">
+          退出登录
+        </button>
+      </div>
+    </aside>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

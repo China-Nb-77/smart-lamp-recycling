@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-quote-system"
+version = "0.1.0"
+description = "Modular image recognition quotation system with RT-DETR, OpenCLIP, FAISS and rule pricing."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "Pillow>=10.0",
+  "safetensors>=0.4",
+  "PyYAML>=6.0"
+]
+
+[project.optional-dependencies]
+ml = [
+  "torch>=2.5",
+  "ultralytics>=8.3",
+  "open_clip_torch>=2.24.0",
+  "faiss-cpu>=1.7.4",
+  "opencv-python>=4.9",
+  "lightgbm>=4.5"
+]
+serve = [
+  "fastapi>=0.115",
+  "uvicorn>=0.30"
+]
+classify = [
+  "transformers>=4.55",
+  "torch>=2.5"
+]
+dev = [
+  "pytest>=8.3"
+]
+
+[project.scripts]
+prepare-data = "image_quote_system.entrypoints:prepare_data_main"
+train-detector = "image_quote_system.entrypoints:train_detector_main"
+validate-detector = "image_quote_system.entrypoints:validate_detector_main"
+export-detector = "image_quote_system.entrypoints:export_detector_main"
+infer-detector = "image_quote_system.entrypoints:infer_detector_main"
+build-index = "image_quote_system.entrypoints:build_index_main"
+evaluate-baseline = "image_quote_system.entrypoints:evaluate_baseline_main"
+train-residual = "image_quote_system.entrypoints:train_residual_main"
+retrieve-similar = "image_quote_system.entrypoints:retrieve_similar_main"
+quote-image = "image_quote_system.entrypoints:quote_image_main"
+serve-api = "image_quote_system.entrypoints:serve_api_main"
+serve-lamp-type-api = "image_quote_system.entrypoints:serve_lamp_type_api_main"
+prelabel-sam3 = "image_quote_system.entrypoints:prelabel_sam3_main"
+download-sam3-community = "image_quote_system.entrypoints:download_sam3_community_main"
+export-annotations = "image_quote_system.entrypoints:export_annotations_main"
+export-training-version = "image_quote_system.entrypoints:export_training_version_main"
+review-annotation = "image_quote_system.entrypoints:review_annotation_main"
+audit-annotations = "image_quote_system.entrypoints:audit_annotations_main"
+apply-review-decisions = "image_quote_system.entrypoints:apply_review_decisions_main"
+
+[tool.setuptools.packages.find]
+include = ["image_quote_system*"]

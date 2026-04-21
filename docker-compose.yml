@@ -1,0 +1,52 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ai_light
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/ai_light
+      AI_LIGHT_SESSION_SECRET: dev-session-secret
+      AI_LIGHT_WORKFLOW_MODE: mock
+      AI_LIGHT_PAYMENT_MODE: mock
+      AI_LIGHT_ALLOW_REVIEW_FALLBACK: "true"
+      AI_LIGHT_BASE_DIR: /app
+      AI_LIGHT_CONFIG_DIR: /app/configs
+    depends_on:
+      - redis
+      - postgres
+    ports:
+      - "8000:8000"
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /workspace/frontend
+    environment:
+      VITE_VISION_API_BASE_URL: http://localhost:8000
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    volumes:
+      - ./:/workspace
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres_data:
+

@@ -1,0 +1,6 @@
+{
+  "appId": "com.smartlamp.app",
+  "appName": "SmartLampAssistant",
+  "webDir": "frontend/dist",
+  "bundledWebRuntime": false
+}

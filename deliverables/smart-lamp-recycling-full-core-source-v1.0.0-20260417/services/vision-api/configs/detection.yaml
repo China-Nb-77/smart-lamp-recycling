@@ -1,0 +1,17 @@
+detector:
+  backend: auto
+  rtdetr_weights: rtdetr-l.pt
+  confidence: 0.25
+  acceptance_confidence: 0.45
+  min_area_ratio: 0.01
+  dedup_iou_threshold: 0.6
+  max_kept_detections: 1
+  image_size: 640
+  train_image_size: 320
+  train_batch: 1
+  train_project: runs/detect
+  train_name: rtdetr-lamp
+  export_format: torchscript
+  device: cpu
+  max_detections: 5
+  fallback_on_empty: true

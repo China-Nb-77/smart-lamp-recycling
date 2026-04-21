@@ -1,0 +1,204 @@
+{
+  "sample_assets": {
+    "raw_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\raw",
+    "query_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\queries",
+    "catalog_image_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\catalog\\images",
+    "evaluation_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\evaluation",
+    "generated_items": [
+      {
+        "sku_id": "SKU-ALU-PENDANT-S",
+        "catalog_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\catalog\\images\\SKU-ALU-PENDANT-S.png",
+        "raw_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\raw\\SKU-ALU-PENDANT-S.png",
+        "query_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\queries\\SKU-ALU-PENDANT-S_query.png",
+        "bbox_xyxy": [
+          166,
+          128,
+          346,
+          322
+        ]
+      },
+      {
+        "sku_id": "SKU-GLASS-FLOOR-M",
+        "catalog_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\catalog\\images\\SKU-GLASS-FLOOR-M.png",
+        "raw_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\raw\\SKU-GLASS-FLOOR-M.png",
+        "query_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\queries\\SKU-GLASS-FLOOR-M_query.png",
+        "bbox_xyxy": [
+          179,
+          127,
+          349,
+          398
+        ]
+      },
+      {
+        "sku_id": "SKU-BRASS-WALL-L",
+        "catalog_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\catalog\\images\\SKU-BRASS-WALL-L.png",
+        "raw_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\raw\\SKU-BRASS-WALL-L.png",
+        "query_image": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\queries\\SKU-BRASS-WALL-L_query.png",
+        "bbox_xyxy": [
+          119,
+          136,
+          395,
+          324
+        ]
+      }
+    ],
+    "baseline_cases": [
+      {
+        "case_id": "SKU-ALU-PENDANT-S_query",
+        "split": "train",
+        "query_image": "data\\queries\\SKU-ALU-PENDANT-S_query.png",
+        "expected_sku_id": "SKU-ALU-PENDANT-S",
+        "expected_bbox_xyxy": "[166, 128, 346, 322]",
+        "expected_quote": 181.58,
+        "expected_material": "aluminum",
+        "expected_size_band": "S",
+        "expected_craft": "matte",
+        "expected_risk_level": "low",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-ALU-PENDANT-S_query_v1",
+        "split": "train",
+        "query_image": "data\\queries\\SKU-ALU-PENDANT-S_query_v1.png",
+        "expected_sku_id": "SKU-ALU-PENDANT-S",
+        "expected_bbox_xyxy": "[176, 124, 356, 318]",
+        "expected_quote": 177.58,
+        "expected_material": "aluminum",
+        "expected_size_band": "S",
+        "expected_craft": "matte",
+        "expected_risk_level": "low",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-ALU-PENDANT-S_query_v2",
+        "split": "test",
+        "query_image": "data\\queries\\SKU-ALU-PENDANT-S_query_v2.png",
+        "expected_sku_id": "SKU-ALU-PENDANT-S",
+        "expected_bbox_xyxy": "[154, 132, 334, 326]",
+        "expected_quote": 183.08,
+        "expected_material": "aluminum",
+        "expected_size_band": "S",
+        "expected_craft": "matte",
+        "expected_risk_level": "low",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-GLASS-FLOOR-M_query",
+        "split": "train",
+        "query_image": "data\\queries\\SKU-GLASS-FLOOR-M_query.png",
+        "expected_sku_id": "SKU-GLASS-FLOOR-M",
+        "expected_bbox_xyxy": "[181, 116, 351, 387]",
+        "expected_quote": 443.09,
+        "expected_material": "glass",
+        "expected_size_band": "M",
+        "expected_craft": "frosted",
+        "expected_risk_level": "medium",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-GLASS-FLOOR-M_query_v1",
+        "split": "train",
+        "query_image": "data\\queries\\SKU-GLASS-FLOOR-M_query_v1.png",
+        "expected_sku_id": "SKU-GLASS-FLOOR-M",
+        "expected_bbox_xyxy": "[191, 127, 361, 398]",
+        "expected_quote": 439.09,
+        "expected_material": "glass",
+        "expected_size_band": "M",
+        "expected_craft": "frosted",
+        "expected_risk_level": "medium",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-GLASS-FLOOR-M_query_v2",
+        "split": "test",
+        "query_image": "data\\queries\\SKU-GLASS-FLOOR-M_query_v2.png",
+        "expected_sku_id": "SKU-GLASS-FLOOR-M",
+        "expected_bbox_xyxy": "[169, 113, 339, 384]",
+        "expected_quote": 444.59,
+        "expected_material": "glass",
+        "expected_size_band": "M",
+        "expected_craft": "frosted",
+        "expected_risk_level": "medium",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-BRASS-WALL-L_query",
+        "split": "train",
+        "query_image": "data\\queries\\SKU-BRASS-WALL-L_query.png",
+        "expected_sku_id": "SKU-BRASS-WALL-L",
+        "expected_bbox_xyxy": "[123, 145, 399, 333]",
+        "expected_quote": 846.01,
+        "expected_material": "brass",
+        "expected_size_band": "L",
+        "expected_craft": "premium-handmade",
+        "expected_risk_level": "medium",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-BRASS-WALL-L_query_v1",
+        "split": "train",
+        "query_image": "data\\queries\\SKU-BRASS-WALL-L_query_v1.png",
+        "expected_sku_id": "SKU-BRASS-WALL-L",
+        "expected_bbox_xyxy": "[133, 131, 409, 319]",
+        "expected_quote": 842.01,
+        "expected_material": "brass",
+        "expected_size_band": "L",
+        "expected_craft": "premium-handmade",
+        "expected_risk_level": "medium",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      },
+      {
+        "case_id": "SKU-BRASS-WALL-L_query_v2",
+        "split": "test",
+        "query_image": "data\\queries\\SKU-BRASS-WALL-L_query_v2.png",
+        "expected_sku_id": "SKU-BRASS-WALL-L",
+        "expected_bbox_xyxy": "[111, 145, 387, 333]",
+        "expected_quote": 847.51,
+        "expected_material": "brass",
+        "expected_size_band": "L",
+        "expected_craft": "premium-handmade",
+        "expected_risk_level": "medium",
+        "detector_version": "rtdetr-lamp",
+        "index_version": "catalog-v1",
+        "pricing_version": "rule-v1"
+      }
+    ]
+  },
+  "baseline_cases_csv": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\evaluation\\baseline_cases.csv",
+  "annotations": {
+    "raw_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\raw",
+    "annotation_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\annotations",
+    "records": [
+      "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\annotations\\records\\SKU-ALU-PENDANT-S.json",
+      "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\annotations\\records\\SKU-BRASS-WALL-L.json",
+      "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\annotations\\records\\SKU-GLASS-FLOOR-M.json"
+    ],
+    "backend": "sam3-threshold-placeholder",
+    "placeholder_backend": true
+  },
+  "exports": {
+    "dataset_yaml": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\detection_dataset\\dataset.yaml",
+    "bbox_export_path": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\annotation_exports\\bboxes.jsonl",
+    "mask_export_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\annotation_exports\\masks",
+    "dataset_dir": "C:\\Users\\LEGION\\Desktop\\灯泡\\data\\detection_dataset",
+    "approved_count": 3,
+    "skipped_count": 0,
+    "skipped_records": []
+  }
+}

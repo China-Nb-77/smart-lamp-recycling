@@ -1,15 +1,22 @@
 {
-  "name": "ai-light-assistant-web",
+  "name": "smart-lamp-assistant",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:web": "npm --prefix frontend run build",
+    "build:apk:web": "npm --prefix frontend run build",
+    "sync:android": "npx cap sync android"
   },
   "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
     "@types/leaflet": "^1.9.21",
+    "axios": "^1.15.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.542.0",
     "qrcode.react": "^4.2.0",

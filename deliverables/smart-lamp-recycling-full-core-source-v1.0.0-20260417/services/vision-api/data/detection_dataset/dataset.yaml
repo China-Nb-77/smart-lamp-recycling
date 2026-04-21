@@ -1,0 +1,5 @@
+path: C:\Users\LEGION\Desktop\灯泡\data\detection_dataset
+train: images/train
+val: images/val
+names:
+  0: lamp

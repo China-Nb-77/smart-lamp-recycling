@@ -1,0 +1,127 @@
+schemas:
+  catalog_fields:
+    - name: sku_id
+      type: string
+      required: true
+      description: Catalog item primary key.
+    - name: title
+      type: string
+      required: true
+      description: Human-readable product title.
+    - name: image_path
+      type: string
+      required: true
+      description: Relative path to the retrieval reference image.
+    - name: visual_style
+      type: enum[pendant,floor,wall]
+      required: true
+      description: Synthetic sample visual family.
+    - name: material
+      type: enum[aluminum,brass,glass]
+      required: true
+      description: Material used for pricing coefficients.
+    - name: size_band
+      type: enum[S,M,L]
+      required: true
+      description: Size coefficient lookup key.
+    - name: craft
+      type: enum[matte,brushed,frosted,premium-handmade]
+      required: true
+      description: Craft coefficient lookup key.
+    - name: base_price
+      type: number
+      required: true
+      description: Base price before multipliers.
+    - name: risk_level
+      type: enum[low,medium,high]
+      required: true
+      description: Risk coefficient lookup key.
+    - name: width_mm
+      type: number
+      required: true
+      description: Reference physical width.
+    - name: height_mm
+      type: number
+      required: true
+      description: Reference physical height.
+  annotation_fields:
+    - name: image_path
+      type: string
+      required: true
+    - name: bbox_xyxy
+      type: list[number]
+      required: true
+    - name: mask_path
+      type: string
+      required: true
+    - name: review_status
+      type: enum[pending,approved,rejected]
+      required: true
+  quote_output_fields:
+    - name: total_quote
+      type: number
+      required: true
+    - name: line_items
+      type: list
+      required: true
+    - name: matched_sku_id
+      type: string
+      required: true
+    - name: base_price
+      type: number
+      required: true
+    - name: material_coefficient
+      type: number
+      required: true
+    - name: size_coefficient
+      type: number
+      required: true
+    - name: craft_coefficient
+      type: number
+      required: true
+    - name: risk_multiplier
+      type: number
+      required: true
+    - name: residual_adjustment
+      type: number
+      required: true
+  baseline_case_fields:
+    - name: case_id
+      type: string
+      required: true
+    - name: split
+      type: enum[train,val,test]
+      required: true
+    - name: query_image
+      type: string
+      required: true
+    - name: expected_sku_id
+      type: string
+      required: true
+    - name: expected_bbox_xyxy
+      type: json[list[number]]
+      required: true
+    - name: expected_quote
+      type: number
+      required: true
+    - name: expected_material
+      type: string
+      required: true
+    - name: expected_size_band
+      type: string
+      required: true
+    - name: expected_craft
+      type: string
+      required: true
+    - name: expected_risk_level
+      type: string
+      required: true
+    - name: detector_version
+      type: string
+      required: true
+    - name: index_version
+      type: string
+      required: true
+    - name: pricing_version
+      type: string
+      required: true

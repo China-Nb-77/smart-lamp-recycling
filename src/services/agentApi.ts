@@ -15,9 +15,10 @@ import type {
 } from '../types/agent';
 import type { ChatCard, PreferenceFieldKey, PreferenceFormSubmission } from '../types/chat';
 import type { VisionRecommendationResponse, VisionQuoteResponse } from '../types/vision';
+import { classifyLamp } from '../api/ai';
 
 const unsupportedFlowError =
-  'Current backend only supports text QA, local image recognition, and the adapted order/logistics flow.';
+  '当前后端仅支持文本问答、本地图片识别，以及已接入的下单/物流流程。';
 
 const visionBaseUrl = import.meta.env.VITE_VISION_API_BASE_URL || '/vision-api';
 
@@ -206,6 +207,7 @@ export const agentApi = {
   },
 
   async uploadOldLamp(sessionId: string, file: File) {
+    const lampTypeResult = await classifyLamp(file).catch(() => null);
     const formData = new FormData();
     formData.append('file', file);
 
@@ -216,6 +218,21 @@ export const agentApi = {
         formData,
       },
     );
+
+    const recycleQuoteCard = response.messages
+      .flatMap((message) => message.cards || [])
+      .find((card): card is { type: 'recycle_quote'; data: VisionQuoteResponse } => card.type === 'recycle_quote');
+
+    if (lampTypeResult && recycleQuoteCard) {
+      recycleQuoteCard.data.summary.lamp_type_label =
+        lampTypeResult.lamp_type || lampTypeResult.label || recycleQuoteCard.data.summary.lamp_type_label;
+      recycleQuoteCard.data.summary.lamp_type_score =
+        lampTypeResult.confidence || lampTypeResult.score || recycleQuoteCard.data.summary.lamp_type_score;
+      recycleQuoteCard.data.summary.lamp_type_backend =
+        lampTypeResult.backend || recycleQuoteCard.data.summary.lamp_type_backend;
+      recycleQuoteCard.data.summary.lamp_type_model_id =
+        lampTypeResult.model_id || recycleQuoteCard.data.summary.lamp_type_model_id;
+    }
 
     const quote = extractQuote(response);
     const nextState = patchChatFlowSession(sessionId, (current) => ({

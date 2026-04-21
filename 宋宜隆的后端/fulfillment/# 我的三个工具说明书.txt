@@ -1,0 +1,35 @@
+# 我的三个工具说明书
+
+## 工具1：创建运单
+- **工具名**：create_waybill
+- **用途**：支付成功后，根据订单号创建运单
+- **需要你提供**：
+  - order_id（订单号）
+- **我会返回**：
+  - waybill_id（运单号）
+  - status（状态：CREATED/SCHEDULED/IN_TRANSIT/DONE/EXCEPTION）
+  - trace_id（追踪ID）
+
+## 工具2：查询轨迹
+- **工具名**：track_logistics
+- **用途**：根据运单号查询物流轨迹
+- **需要你提供**：
+  - waybill_id（运单号）
+- **我会返回**：
+  - waybill_id（运单号）
+  - events（轨迹列表：每条有时间、状态、描述）
+  - trace_id（追踪ID）
+
+## 工具3：创建工单
+- **工具名**：open_ticket
+- **用途**：出现异常时创建工单转人工
+- **需要你提供**：
+  - order_id（订单号）
+  - reason（原因：地址不全/低置信度/支付异常/其他）
+  - detail（详细描述）
+  - waybill_id（运单号，如果有）
+- **我会返回**：
+  - ticket_id（工单号）
+  - status（工单状态）
+  - trace_id（追踪ID）
+                  我的 Mock Server 地址：https://ab073392-d162-4cd0-afb7-e1903c24c109.mock.pstmn.io

@@ -1,277 +1,287 @@
-import io
-import json
+from __future__ import annotations
+
 import os
-import threading
-import unittest
-import urllib.parse
-import urllib.request
+from importlib import import_module, reload
+import io
+from pathlib import Path
 
-from image_quote_system.serving.agent_backend import AgentBackend
-from image_quote_system.serving.api import QuoteApiHandler, build_server
+from fastapi.testclient import TestClient
+from PIL import Image
+
+from backend.app.llm import LLMDecision
+from backend.app.models import QuoteResponse, QuoteSummary, UploadInfo
+from backend.app.service import FOLLOW_UP_QUESTIONS
 
 
-class AgentApiTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        os.environ["AI_LIGHT_AGENT_MODE"] = "mock"
-        QuoteApiHandler.agent_backend = AgentBackend()
-        cls.server = build_server(host="127.0.0.1", port=0, config_dir="configs")
-        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
-        cls.thread.start()
-        cls.base_url = f"http://127.0.0.1:{cls.server.server_port}"
+def build_png() -> bytes:
+    buffer = io.BytesIO()
+    Image.new("RGB", (2, 2), color=(255, 255, 255)).save(buffer, format="PNG")
+    return buffer.getvalue()
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.server.shutdown()
-        cls.server.server_close()
-        cls.thread.join(timeout=2)
 
-    def request_json(self, path: str, method: str = "GET", body: dict | None = None):
-        data = None
-        headers = {}
-        if body is not None:
-            data = json.dumps(body, ensure_ascii=False).encode("utf-8")
-            headers["Content-Type"] = "application/json"
-        request = urllib.request.Request(f"{self.base_url}{path}", data=data, method=method, headers=headers)
-        with urllib.request.urlopen(request) as response:
-            return json.loads(response.read().decode("utf-8"))
+def build_client(tmp_path: Path) -> TestClient:
+    os.environ["DATABASE_URL"] = f"sqlite:///{(tmp_path / 'agent-test.db').as_posix()}"
+    os.environ["REDIS_URL"] = "fakeredis://local"
+    os.environ["AI_LIGHT_WORKFLOW_MODE"] = "mock"
+    os.environ["AI_LIGHT_PAYMENT_MODE"] = "mock"
+    os.environ["AI_LIGHT_ALLOW_REVIEW_FALLBACK"] = "true"
+    module = reload(import_module("backend.app.main"))
+    return TestClient(module.create_app())
 
-    def request_multipart(self, path: str, field_name: str, filename: str, content: bytes):
-        boundary = "----CodexBoundary12345"
-        payload = (
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="{field_name}"; filename="{filename}"\r\n'
-            "Content-Type: image/png\r\n\r\n"
-        ).encode("utf-8") + content + f"\r\n--{boundary}--\r\n".encode("utf-8")
-        request = urllib.request.Request(
-            f"{self.base_url}{path}",
-            data=payload,
-            method="POST",
-            headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
-        )
-        with urllib.request.urlopen(request) as response:
-            return json.loads(response.read().decode("utf-8"))
 
-    def build_image(self) -> bytes:
-        return (
-            b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01"
-            b"\x08\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDAT\x08\xd7c\xf8\xff\xff?"
-            b"\x00\x05\xfe\x02\xfeA\xd9\xb4\xa6\x00\x00\x00\x00IEND\xaeB`\x82"
-        )
+def create_session(client: TestClient, client_session_id: str = "local-session-1") -> dict:
+    response = client.post("/agent/sessions", json={"client_session_id": client_session_id})
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert payload["session_id"] != client_session_id
+    assert payload["session_token"]
+    return payload
 
-    def prepare_session(self):
-        session_id = "test-session"
-        self.request_json("/agent/sessions", method="POST", body={"session_id": session_id})
-        upload = self.request_multipart(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/image",
-            "file",
-            "lamp.png",
-            self.build_image(),
-        )
-        self.request_json(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/messages",
-            method="POST",
-            body={"text": "吊灯"},
-        )
-        self.request_json(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/messages",
-            method="POST",
-            body={"text": "客厅"},
-        )
-        recommend = self.request_json(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/messages",
-            method="POST",
-            body={"text": "性价比优先"},
-        )
-        recommendation_card = recommend["messages"][0]["cards"][0]["data"]
-        selected_sku = recommendation_card["recommendations"][0]["sku_id"]
-        return session_id, upload, recommendation_card, selected_sku
 
-    def test_01_image_upload_recognition_api(self):
-        session_id = "upload-session"
-        self.request_json("/agent/sessions", method="POST", body={"session_id": session_id})
-        payload = self.request_multipart(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/image",
-            "file",
-            "old-lamp.png",
-            self.build_image(),
-        )
-        self.assertEqual(payload["session_id"], session_id)
-        self.assertEqual(payload["messages"][0]["cards"][0]["type"], "recycle_quote")
+def auth_headers(session_payload: dict) -> dict[str, str]:
+    return {"Authorization": f"Bearer {session_payload['session_token']}"}
 
-    def test_02_quote_api(self):
-        payload = self.request_multipart("/quote-upload", "file", "quote.png", self.build_image())
-        self.assertIn("summary", payload)
-        self.assertGreater(payload["summary"]["recycle_quote"], 0)
 
-    def test_03_recommend_api(self):
-        payload = self.request_json(
-            "/recommend",
-            method="POST",
-            body={
-                "reference_sku_id": "SKU-ALU-PENDANT-S",
-                "preferences": {
-                    "install_type": "pendant",
-                    "budget_level": "economy",
-                    "material": "any",
+def fake_decision(
+    reply: str,
+    *,
+    intent: str,
+    slots: dict | None = None,
+    confidence: float = 0.92,
+) -> LLMDecision:
+    return LLMDecision(
+        reply=reply,
+        intent=intent,
+        confidence=confidence,
+        slots=slots or {},
+        trace={
+            "model": "fake-siliconflow",
+            "prompt": [],
+            "response": "",
+            "latency": 1,
+            "provider_response": "{}",
+            "prompt_version": "test",
+        },
+    )
+
+
+def test_server_issues_session_id_and_token(tmp_path: Path):
+    client = build_client(tmp_path)
+    payload = create_session(client, client_session_id="browser-local-id")
+    assert payload["state"] == "init"
+    assert payload["user_id"].startswith("guest_")
+
+
+def test_review_fallback_requires_manual_review_and_blocks_checkout(tmp_path: Path):
+    client = build_client(tmp_path)
+    service = client.app.state.context.service
+    decisions = [
+        fake_decision(
+            "旧灯图我已经收到，但当前识别结果需要人工复核。我先记住你的偏好，继续给你看目录推荐。",
+            intent="collect_pref",
+        ),
+        fake_decision(
+            "我先按你的需求给你看目录推荐，不过这次识别还在人工复核里，所以不会直接开放下单。",
+            intent="recommend",
+            slots={"space": "living_room", "budget_level": "balanced", "install_type": "pendant"},
+        ),
+    ]
+    service.agent_brain.decide = lambda **kwargs: decisions.pop(0)  # type: ignore[method-assign]
+    session = create_session(client, client_session_id="review-flow")
+
+    upload = client.post(
+        f"/agent/sessions/{session['session_id']}/image",
+        headers=auth_headers(session),
+        files={"file": ("lamp.png", build_png(), "image/png")},
+    )
+    assert upload.status_code == 200, upload.text
+    upload_payload = upload.json()
+    quote_card = upload_payload["messages"][0]["cards"][0]["data"]
+    assert quote_card["summary"]["requires_review"] is True
+    assert quote_card["summary"]["checkout_allowed"] is False
+
+    recommend = client.post(
+        f"/agent/sessions/{session['session_id']}/preferences",
+        headers=auth_headers(session),
+        json={
+            "space": "living_room",
+            "budget_level": "balanced",
+            "install_type": "pendant",
+        },
+    )
+    assert recommend.status_code == 200, recommend.text
+    rec_payload = recommend.json()["messages"][0]["cards"][0]["data"]
+    assert rec_payload["source"] == "catalog"
+    assert rec_payload["requires_review"] is True
+    assert rec_payload["checkout_allowed"] is False
+
+    sku_id = rec_payload["recommendations"][0]["sku_id"]
+    blocked = client.post(
+        f"/agent/sessions/{session['session_id']}/recommendations/select",
+        headers=auth_headers(session),
+        json={"sku_id": sku_id},
+    )
+    assert blocked.status_code == 412, blocked.text
+    assert blocked.json()["code"] == "requires_review"
+
+
+def test_non_review_session_can_create_order_and_qr(tmp_path: Path):
+    client = build_client(tmp_path)
+    service = client.app.state.context.service
+    decisions = [
+        fake_decision(
+            "旧灯我先识别好了，你前面提到的需求我也记下来了，我直接给你筛推荐。",
+            intent="recommend",
+            slots={"space": "living_room", "budget_level": "balanced", "install_type": "pendant"},
+        ),
+        fake_decision(
+            "我已经整理好你的偏好，下面给你看推荐结果。",
+            intent="recommend",
+            slots={"space": "living_room", "budget_level": "balanced", "install_type": "pendant"},
+        ),
+    ]
+    service.agent_brain.decide = lambda **kwargs: decisions.pop(0)  # type: ignore[method-assign]
+
+    def safe_quote(*, image_path, request_id):
+        return QuoteResponse(
+            quote={
+                "image_path": str(image_path),
+                "detection_backend": "unit-test",
+                "embedding_backend": "unit-test",
+                "retrieval_backend": "catalog-rules",
+                "currency": "CNY",
+                "total_quote": 88.0,
+                "price_summary": {
+                    "line_item_count": 1,
+                    "subtotal_before_residual": 88.0,
+                    "residual_total": 0.0,
+                    "total_quote": 88.0,
+                    "currency": "CNY",
                 },
-                "limit": 3,
-            },
-        )
-        self.assertIn("recommendations", payload)
-        self.assertGreaterEqual(len(payload["recommendations"]), 1)
-
-    def test_04_agent_session_api(self):
-        session_id, _, recommendation_card, _ = self.prepare_session()
-        self.assertEqual(recommendation_card["session_id"], session_id)
-        self.assertGreaterEqual(len(recommendation_card["recommendations"]), 1)
-
-    def test_05_form_submit_api(self):
-        session_id, upload, _, selected_sku = self.prepare_session()
-        self.request_json(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/recommendations/select",
-            method="POST",
-            body={"sku_id": selected_sku},
-        )
-        form = self.request_json(
-            f"/agent/forms/checkout?session_id={urllib.parse.quote(session_id)}",
-        )
-        order = self.request_json(
-            "/agent/orders",
-            method="POST",
-            body={
-                "session_id": session_id,
-                "trace_id": "trace_test",
-                "user": {"name": "Test User", "phone": "13800000000"},
-                "address": {
-                    "full_address": "上海市浦东新区张江路 88 号",
-                    "region": "shanghai",
-                    "city": "上海市",
-                    "district": "浦东新区",
+                "detection_summary": {
+                    "backend": "unit-test",
+                    "used_fallback": False,
+                    "notes": [],
+                    "detections": [],
                 },
-                "items": [
+                "line_items": [
                     {
-                        "selected_old_sku": upload["messages"][0]["cards"][0]["data"]["summary"]["matched_sku_id"],
-                        "selected_new_sku": form["selection"]["selected_new_sku"],
-                        "qty": 1,
+                        "detection_index": 0,
+                        "matched_sku_id": "SKU-ALU-PENDANT-S",
+                        "title": "Aluminum Pendant Lamp",
+                        "base_price": 299.0,
+                        "final_quote": 88.0,
+                        "similarity_score": 0.99,
+                        "detection_confidence": 0.95,
+                        "matched_product": {"metadata": {"visual_style": "pendant"}},
+                        "topk_similar_items": [],
+                        "breakdown": {},
+                        "price_composition": {},
                     }
                 ],
-                "payable_total": form["summary"]["payable_total_fen"],
-                "currency": "CNY",
-                "amount_unit": "FEN",
-                "access_domain": "http://localhost:5173",
             },
+            summary=QuoteSummary(
+                recognized_type="pendant",
+                matched_sku_id="SKU-ALU-PENDANT-S",
+                matched_title="Aluminum Pendant Lamp",
+                recycle_quote=88.0,
+                currency="CNY",
+                detection_backend="unit-test",
+                requires_review=False,
+                review_reasons=[],
+                checkout_allowed=True,
+            ),
+            follow_up_questions=FOLLOW_UP_QUESTIONS,
+            upload=UploadInfo(filename="lamp.png", stored_path="artifacts/uploads/agent-api/test.png", size_bytes=67),
         )
-        self.assertIn("order_id", order)
-        self.order_id = order["order_id"]
 
-    def test_06_qr_order_api(self):
-        session_id, upload, _, selected_sku = self.prepare_session()
-        self.request_json(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/recommendations/select",
-            method="POST",
-            body={"sku_id": selected_sku},
-        )
-        form = self.request_json(f"/agent/forms/checkout?session_id={urllib.parse.quote(session_id)}")
-        order = self.request_json(
-            "/agent/orders",
-            method="POST",
-            body={
-                "session_id": session_id,
-                "trace_id": "trace_test_qr",
-                "user": {"name": "Test User", "phone": "13800000000"},
-                "address": {"full_address": "上海市浦东新区张江路 88 号"},
-                "items": [
-                    {
-                        "selected_old_sku": upload["messages"][0]["cards"][0]["data"]["summary"]["matched_sku_id"],
-                        "selected_new_sku": form["selection"]["selected_new_sku"],
-                        "qty": 1,
-                    }
-                ],
-                "payable_total": form["summary"]["payable_total_fen"],
-                "currency": "CNY",
-                "amount_unit": "FEN",
+    service.quote_image = safe_quote  # type: ignore[method-assign]
+
+    session = create_session(client, client_session_id="happy-flow")
+    upload = client.post(
+        f"/agent/sessions/{session['session_id']}/image",
+        headers=auth_headers(session),
+        files={"file": ("lamp.png", build_png(), "image/png")},
+    )
+    assert upload.status_code == 200, upload.text
+
+    recommend = client.post(
+        f"/agent/sessions/{session['session_id']}/preferences",
+        headers=auth_headers(session),
+        json={
+            "space": "living_room",
+            "budget_level": "balanced",
+            "install_type": "pendant",
+        },
+    )
+    assert recommend.status_code == 200, recommend.text
+    recommendations = recommend.json()["messages"][0]["cards"][0]["data"]
+    sku_id = recommendations["recommendations"][0]["sku_id"]
+
+    selected = client.post(
+        f"/agent/sessions/{session['session_id']}/recommendations/select",
+        headers=auth_headers(session),
+        json={"sku_id": sku_id},
+    )
+    assert selected.status_code == 200, selected.text
+
+    checkout = client.get(
+        f"/agent/forms/checkout?session_id={session['session_id']}",
+        headers=auth_headers(session),
+    )
+    assert checkout.status_code == 200, checkout.text
+    checkout_payload = checkout.json()
+    assert "todo" in checkout_payload["summary"]
+
+    order = client.post(
+        "/agent/orders",
+        headers=auth_headers(session),
+        json={
+            "session_id": session["session_id"],
+            "trace_id": "trace_test_happy",
+            "user": {"user_id": "user-1", "name": "Test User", "phone": "13800000000"},
+            "address": {
+                "full_address": "上海市浦东新区测试路 100 号",
+                "region": "CN",
+                "province": "上海市",
+                "city": "上海市",
+                "district": "浦东新区",
+                "street": "测试路 100 号",
+                "longitude": 121.544,
+                "latitude": 31.221,
+                "location_source": "USER_INPUT",
+                "address_source": "USER_INPUT",
             },
-        )
-        qr = self.request_json(
-            f"/agent/orders/{urllib.parse.quote(order['order_id'])}/qr",
-            method="POST",
-            body={"trade_type": "NATIVE", "return_url": "http://localhost:5173/payment/success"},
-        )
-        self.assertIn("qr_token", qr)
-        self.assertIn("code_url", qr)
+            "items": [
+                {
+                    "selected_old_sku": "SKU-ALU-PENDANT-S",
+                    "selected_new_sku": checkout_payload["selection"]["selected_new_sku"],
+                    "qty": 1,
+                }
+            ],
+            "payable_total": checkout_payload["summary"]["payable_total_fen"],
+            "currency": "CNY",
+            "amount_unit": "FEN",
+            "access_domain": "http://localhost:5173",
+        },
+    )
+    assert order.status_code == 200, order.text
+    order_payload = order.json()
+    assert order_payload["order_id"].startswith("ord_")
+    assert order_payload["snapshot"]["session_id"] == session["session_id"]
 
-    def test_07_order_status_api(self):
-        session_id, upload, _, selected_sku = self.prepare_session()
-        self.request_json(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/recommendations/select",
-            method="POST",
-            body={"sku_id": selected_sku},
-        )
-        form = self.request_json(f"/agent/forms/checkout?session_id={urllib.parse.quote(session_id)}")
-        order = self.request_json(
-            "/agent/orders",
-            method="POST",
-            body={
-                "session_id": session_id,
-                "trace_id": "trace_test_status",
-                "user": {"name": "Test User", "phone": "13800000000"},
-                "address": {"full_address": "上海市浦东新区张江路 88 号"},
-                "items": [
-                    {
-                        "selected_old_sku": upload["messages"][0]["cards"][0]["data"]["summary"]["matched_sku_id"],
-                        "selected_new_sku": form["selection"]["selected_new_sku"],
-                        "qty": 1,
-                    }
-                ],
-                "payable_total": form["summary"]["payable_total_fen"],
-                "currency": "CNY",
-                "amount_unit": "FEN",
-            },
-        )
-        status = self.request_json(f"/agent/orders/{urllib.parse.quote(order['order_id'])}?sync=true")
-        self.assertEqual(status["order_id"], order["order_id"])
+    qr = client.post(
+        f"/agent/orders/{order_payload['order_id']}/qr",
+        json={"trade_type": "NATIVE", "return_url": "http://localhost:5173/payment/success"},
+    )
+    assert qr.status_code == 200, qr.text
+    qr_payload = qr.json()
+    assert qr_payload["qr_token"]
+    assert qr_payload["mock_mode"] is True
 
-    def test_08_logistics_api(self):
-        session_id, upload, _, selected_sku = self.prepare_session()
-        self.request_json(
-            f"/agent/sessions/{urllib.parse.quote(session_id)}/recommendations/select",
-            method="POST",
-            body={"sku_id": selected_sku},
-        )
-        form = self.request_json(f"/agent/forms/checkout?session_id={urllib.parse.quote(session_id)}")
-        order = self.request_json(
-            "/agent/orders",
-            method="POST",
-            body={
-                "session_id": session_id,
-                "trace_id": "trace_test_logistics",
-                "user": {"name": "Test User", "phone": "13800000000"},
-                "address": {"full_address": "上海市浦东新区张江路 88 号"},
-                "items": [
-                    {
-                        "selected_old_sku": upload["messages"][0]["cards"][0]["data"]["summary"]["matched_sku_id"],
-                        "selected_new_sku": form["selection"]["selected_new_sku"],
-                        "qty": 1,
-                    }
-                ],
-                "payable_total": form["summary"]["payable_total_fen"],
-                "currency": "CNY",
-                "amount_unit": "FEN",
-            },
-        )
-        self.request_json(
-            f"/agent/orders/{urllib.parse.quote(order['order_id'])}/qr",
-            method="POST",
-            body={"trade_type": "NATIVE", "return_url": "http://localhost:5173/payment/success"},
-        )
-        logistics = self.request_json(f"/agent/orders/{urllib.parse.quote(order['order_id'])}/logistics")
-        logistics_map = self.request_json(
-            f"/agent/orders/{urllib.parse.quote(order['order_id'])}/logistics-map"
-        )
-        self.assertIn("events", logistics)
-        self.assertIn("route", logistics_map)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    timeline = client.get(
+        f"/agent/sessions/{session['session_id']}/timeline",
+        headers=auth_headers(session),
+    )
+    assert timeline.status_code == 200, timeline.text
+    assert len(timeline.json()["events"]) >= 4

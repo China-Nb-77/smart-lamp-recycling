@@ -1,0 +1,16 @@
+.git
+.venv
+node_modules
+frontend/node_modules
+AILightShell/node_modules
+mobile/AILightShell/node_modules
+dist
+dist_package
+build
+deliverables
+runs
+__pycache__
+*.zip
+artifacts/logs
+artifacts/uploads
+

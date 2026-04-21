@@ -1,4 +1,4 @@
-﻿package com.example.demo.service;
+package com.example.demo.service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -118,13 +118,13 @@ public class SiliconFlowAiService {
             case "track_logistics":
                 return trackLogistics(params);
             default:
-                return "Unknown tool";
+                return "暂不支持该工具调用。";
         }
     }
 
     private String callSiliconFlow(List<Map<String, String>> messages) {
         if (apiKey == null || apiKey.isBlank()) {
-            return "AI service is not configured. Please set SILICONFLOW_API_KEY.";
+            return "AI 服务未配置，请先设置 SILICONFLOW_API_KEY。";
         }
 
         Map<String, Object> requestBody = new HashMap<>();
@@ -141,22 +141,22 @@ public class SiliconFlowAiService {
             String url = baseUrl + "/chat/completions";
             ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
             if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
-                return "AI service is temporarily unavailable.";
+                return "AI 服务暂时不可用，请稍后再试。";
             }
 
             Object choicesObj = response.getBody().get("choices");
             if (!(choicesObj instanceof List<?> choices) || choices.isEmpty()) {
-                return "AI service is temporarily unavailable.";
+                return "AI 服务暂时不可用，请稍后再试。";
             }
 
             Object firstChoice = choices.get(0);
             if (!(firstChoice instanceof Map<?, ?> choiceMap)) {
-                return "AI service is temporarily unavailable.";
+                return "AI 服务暂时不可用，请稍后再试。";
             }
 
             Object messageObj = choiceMap.get("message");
             if (!(messageObj instanceof Map<?, ?> messageMap)) {
-                return "AI service is temporarily unavailable.";
+                return "AI 服务暂时不可用，请稍后再试。";
             }
 
             Object contentObj = messageMap.get("content");
@@ -164,10 +164,10 @@ public class SiliconFlowAiService {
                 return content;
             }
 
-            return "AI service returned an empty answer.";
+            return "AI 服务返回了空内容。";
         } catch (Exception e) {
             e.printStackTrace();
-            return "AI service is temporarily unavailable.";
+            return "AI 服务暂时不可用，请稍后再试。";
         }
     }
 
@@ -188,18 +188,18 @@ public class SiliconFlowAiService {
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(orderServiceUrl, entity, Map.class);
             if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
-                return "Order service is temporarily unavailable.";
+                return "下单服务暂时不可用，请稍后再试。";
             }
 
             Map<String, Object> body = response.getBody();
             Object orderId = extractValue(body, "order_id");
             if (orderId == null) {
-                return "Order service did not return order_id.";
+                return "下单服务未返回订单号。";
             }
-            return "Order created: " + orderId;
+            return "下单成功，订单号：" + orderId;
         } catch (Exception e) {
             e.printStackTrace();
-            return "Order service is temporarily unavailable.";
+            return "下单服务暂时不可用，请稍后再试。";
         }
     }
 
@@ -213,18 +213,18 @@ public class SiliconFlowAiService {
         try {
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
             if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
-                return "Tracking service is temporarily unavailable.";
+                return "物流服务暂时不可用，请稍后再试。";
             }
 
             Map<String, Object> body = response.getBody();
             Object eventsObj = extractValue(body, "events");
             if (!(eventsObj instanceof List<?> events) || events.isEmpty()) {
-                return "No tracking updates yet.";
+                return "当前暂无物流更新。";
             }
 
             Object last = events.get(events.size() - 1);
             if (!(last instanceof Map<?, ?> lastEvent)) {
-                return "Tracking format is invalid.";
+                return "物流返回格式异常。";
             }
 
             Object desc = lastEvent.get("desc");
@@ -232,10 +232,10 @@ public class SiliconFlowAiService {
                 desc = lastEvent.get("status");
             }
 
-            return "Current tracking status: " + String.valueOf(desc == null ? "unknown" : desc);
+            return "当前物流状态：" + String.valueOf(desc == null ? "未知" : desc);
         } catch (Exception e) {
             e.printStackTrace();
-            return "Tracking service is temporarily unavailable.";
+            return "物流服务暂时不可用，请稍后再试。";
         }
     }
 

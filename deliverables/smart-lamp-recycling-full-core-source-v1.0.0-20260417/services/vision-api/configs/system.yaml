@@ -1,0 +1,52 @@
+project:
+  name: image-quote-system
+  root_dir: .
+  default_category_name: lamp
+
+annotation:
+  sam3:
+    enabled: true
+    text_prompt: lamp
+    backend_priority:
+      - official
+      - bridge
+      - placeholder
+    official:
+      device: cuda
+      device_env: SAM3_DEVICE
+      checkpoint: artifacts/models/sam3-community/sam3.safetensors
+      checkpoint_env: SAM3_CHECKPOINT
+      model_cfg: ""
+      model_cfg_env: SAM3_MODEL_CFG
+    bridge:
+      python_executable: ""
+      python_executable_env: SAM3_BRIDGE_PYTHON
+      working_dir: ""
+      working_dir_env: SAM3_BRIDGE_WORKDIR
+      checkpoint: artifacts/models/sam3-community/sam3.safetensors
+      checkpoint_env: SAM3_CHECKPOINT
+      model_cfg: ""
+      model_cfg_env: SAM3_MODEL_CFG
+      device: cuda
+      device_env: SAM3_DEVICE
+      timeout_seconds: 120
+    community_checkpoint:
+      repo_id: AEmotionStudio/sam3
+      filename: sam3.safetensors
+      revision: main
+      local_path: artifacts/models/sam3-community/sam3.safetensors
+
+paths:
+  raw_dir: data/raw
+  query_dir: data/queries
+  catalog_csv: data/catalog/catalog.csv
+  annotation_dir: data/annotations
+  annotation_exports_dir: data/annotation_exports
+  annotation_review_dir: artifacts/annotation_review
+  detection_dataset_dir: data/detection_dataset
+  evaluation_dir: data/evaluation
+  baseline_cases_csv: data/evaluation/baseline_cases.csv
+  quote_artifact_dir: artifacts/quotes
+  detector_model_dir: artifacts/models/detector
+  report_dir: artifacts/reports
+  dataset_version_dir: artifacts/dataset_versions
