@@ -33,7 +33,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install root dependencies
+      - name: Install root dependencies (npm install)
         run: npm install
 
       - name: Install frontend dependencies
