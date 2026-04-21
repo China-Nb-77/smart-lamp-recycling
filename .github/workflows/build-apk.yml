@@ -34,7 +34,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install root dependencies
-        run: npm ci
+        run: npm install
 
       - name: Install frontend dependencies
         run: npm --prefix frontend ci
