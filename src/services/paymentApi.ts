@@ -14,8 +14,9 @@ import type {
 } from '../types/agent';
 import type { ElectronicOrderResponse } from '../types/api';
 
-const visionBaseUrl = import.meta.env.VITE_VISION_API_BASE_URL || '/vision-api';
-const songBaseUrl = import.meta.env.VITE_SONG_API_BASE_URL || '/song-api';
+// 硬编码后端地址
+const visionBaseUrl = 'http://114.215.177.52:8000/vision-api';
+const songBaseUrl = 'http://114.215.177.52:8000/song-api';
 const SONG_ORDER_CACHE_KEY = 'ai-light.song.order-cache';
 
 type RequestOptions = {
