@@ -8,9 +8,19 @@
     />
     <meta name="theme-color" content="#f6f6f2" />
     <title>AI 灯具助手</title>
+    <script>
+      // 强制写死后端地址
+      window.__API_BASE_URL__ = 'http://114.215.177.52:8000';
+      window.__VISION_API_URL__ = 'http://114.215.177.52:8000/vision-api';
+      window.__PAYMENT_API_URL__ = 'http://114.215.177.52:8000/pay-api';
+      window.__AGENT_API_URL__ = 'http://114.215.177.52:8000/api';
+      localStorage.setItem('VITE_API_BASE_URL', 'http://114.215.177.52:8000');
+      localStorage.setItem('VITE_VISION_API_BASE_URL', 'http://114.215.177.52:8000/vision-api');
+      localStorage.setItem('VITE_PAYMENT_API_BASE_URL', 'http://114.215.177.52:8000/pay-api');
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
-  </html>
+</html>
