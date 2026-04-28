@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_PROXY_TARGET || 'http://192.168.200.51:8080';
   const paymentTarget = env.VITE_PAYMENT_PROXY_TARGET || 'http://192.168.200.51:8081';
   const songTarget = env.VITE_SONG_PROXY_TARGET || apiTarget;
-  const visionTarget = env.VITE_VISION_PROXY_TARGET || 'http://127.0.0.1:8000';
+  const visionTarget = env.VITE_VISION_PROXY_TARGET || 'http://114.215.177.52:8000';
 
   return {
     plugins: [react()],
