@@ -20,9 +20,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -33,14 +31,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install root dependencies (npm install)
-        run: npm install
-
-      - name: Install frontend dependencies
-        run: npm --prefix frontend ci
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build frontend
-        run: npm --prefix frontend run build
+        run: npm run build
         env:
           VITE_API_BASE_URL: http://114.215.177.52:8000
           VITE_VISION_API_BASE_URL: http://114.215.177.52:8000
@@ -60,14 +55,15 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           manifest_path = Path("android/app/src/main/AndroidManifest.xml")
-          text = manifest_path.read_text(encoding="utf-8")
-          if 'android:usesCleartextTraffic=' not in text:
-              text = text.replace(
-                  "<application",
-                  '<application android:usesCleartextTraffic="true"',
-                  1,
-              )
-              manifest_path.write_text(text, encoding="utf-8")
+          if manifest_path.exists():
+              text = manifest_path.read_text(encoding="utf-8")
+              if 'android:usesCleartextTraffic=' not in text:
+                  text = text.replace(
+                      "<application",
+                      '<application android:usesCleartextTraffic="true"',
+                      1,
+                  )
+                  manifest_path.write_text(text, encoding="utf-8")
           PY
 
       - name: Build debug APK
