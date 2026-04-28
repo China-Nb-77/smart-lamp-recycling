@@ -1,6 +1,12 @@
 {
-  "appId": "com.smartlamp.app",
+  "appId": "com.smartlamp.assistant",
   "appName": "SmartLampAssistant",
-  "webDir": "frontend/dist",
-  "bundledWebRuntime": false
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true,
+    "allowNavigation": [
+      "114.215.177.52"
+    ]
+  }
 }
