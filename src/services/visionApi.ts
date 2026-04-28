@@ -6,7 +6,7 @@ import type {
   VisionRecommendationResponse,
 } from '../types/vision';
 
-const visionBaseUrl = import.meta.env.VITE_VISION_API_BASE_URL || '/vision-api';
+const visionBaseUrl = 'http://114.215.177.52:8000/vision-api';
 
 export function buildVisionImageUrl(imagePath?: string) {
   if (!imagePath) {
