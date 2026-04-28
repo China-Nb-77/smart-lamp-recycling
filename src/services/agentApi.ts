@@ -20,7 +20,8 @@ import { classifyLamp } from '../api/ai';
 const unsupportedFlowError =
   '当前后端仅支持文本问答、本地图片识别，以及已接入的下单/物流流程。';
 
-const visionBaseUrl = import.meta.env.VITE_VISION_API_BASE_URL || '/vision-api';
+// 硬编码后端地址
+const visionBaseUrl = 'http://114.215.177.52:8000/vision-api';
 
 type VisionRequestOptions = {
   method?: 'GET' | 'POST';
