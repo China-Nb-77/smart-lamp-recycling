@@ -1,4 +1,4 @@
-function normalizeBaseUrl(rawValue: string | undefined, fallback: string) {
+﻿function normalizeBaseUrl(rawValue: string | undefined, fallback: string) {
   const value = String(rawValue || fallback).trim();
   if (!value) {
     return fallback;
@@ -17,7 +17,8 @@ export function resolveRequestUrl(baseUrl: string, path: string) {
   return `${baseUrl}${normalizedPath}`;
 }
 
-const configuredApiBaseUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL, '');
+// 强制使用公网 IP 作为默认值
+const configuredApiBaseUrl = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL, 'http://114.215.177.52:8000');
 
 export const apiBaseUrl = configuredApiBaseUrl;
 export const legacyApiBaseUrl = normalizeBaseUrl(
@@ -26,9 +27,9 @@ export const legacyApiBaseUrl = normalizeBaseUrl(
 );
 export const visionBaseUrl = normalizeBaseUrl(
   import.meta.env.VITE_VISION_API_BASE_URL,
-  configuredApiBaseUrl || '/vision-api',
+  'http://114.215.177.52:8000',
 );
 export const paymentBaseUrl = normalizeBaseUrl(
   import.meta.env.VITE_PAYMENT_API_BASE_URL,
-  configuredApiBaseUrl || '/pay-api',
+  'http://114.215.177.52:8000',
 );
