@@ -1,0 +1,87 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.local
+*.secret
+*.secrets
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+.bundle/
+application-local*.yml
+application-local*.yaml
+application-local*.properties
+bootstrap-local*.yml
+bootstrap-local*.yaml
+bootstrap-local*.properties
+settings.xml
+AILightShell/src/config/env.ts
+fulfillment - 副本/src/main/resources/appliccation.properties
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node / frontend
+node_modules/
+coverage/
+
+# Java / Gradle / Maven
+target/
+.m2/
+.gradle/
+out/
+*.class
+
+# React Native / mobile build outputs
+Pods/
+DerivedData/
+*.apk
+*.aab
+
+# Generated artifacts and local tooling
+.tools/
+artifacts/
+build/
+dist/
+dist_package/
+runs/
+logs/
+uploads/
+pids.json
+*.log
+
+# Large models and packaged files
+*.zip
+*.pt
+*.pth
+*.torchscript
+*.onnx
+*.bin
+*.safetensors
+
+# Local data and scratch assets
+images/
+one_image/
+sam3-main/
+__pycache__/
+
+# Optional local-only folders/docs
+后端文件/
+甘特表/
+AGENTS.md
+system-file.md
+
+AILightShell/android/app/debug.keystore
