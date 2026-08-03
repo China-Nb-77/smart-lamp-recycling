@@ -1,15 +1,32 @@
-# 图像识别报价系统
+# 智能灯具回收图像识别报价系统
 
-当前仓库包含一条可运行的端到端链路：
+这是一个面向智能灯具回收场景的图像识别报价系统。仓库覆盖了从数据准备、预标注、人工审核，到检测、检索、规则报价和 residual 校正的完整链路。
+
+端到端流程如下：
 
 `原始图片 -> SAM3 预标注 -> 人工审核 -> 检测训练集导出 -> RT-DETR 检测 -> ROI 裁剪 -> OpenCLIP 检索 -> 规则报价 -> LightGBM residual 修正`
 
-本仓库已具备以下特性：
+## 当前能力
 
-- `SAM3` 支持 `official -> bridge -> placeholder` 多级回退。
-- `baseline` 评估会输出总览、明细 CSV、样例报告和可选对比报告。
-- 审核结果可以直接导出下一轮训练集，并记录版本快照。
-- 现有自动化测试覆盖主报价链路、审核面板、`SAM3 placeholder fallback`、`baseline` 评估、`LightGBM residual` 训练与降级、训练集版本导出、`SAM3 bridge` mock 集成。
+- `SAM3` 支持 `official -> bridge -> placeholder` 多级回退
+- `baseline` 评估输出总览、明细 CSV、样例报告和对比报告
+- 审核结果可直接导出下一轮训练集，并记录版本快照
+- 自动化测试覆盖主报价链路、审核面板、回退逻辑、训练集版本导出和 bridge mock 集成
+
+## 仓库结构
+
+- `image_quote_system/`：核心 Python 包与 CLI 入口
+- `backend/`：后端服务相关代码
+- `frontend/`：前端页面与交互
+- `configs/`：系统配置、模型配置和报价规则
+- `data/`：样例数据、标注和导出产物
+- `artifacts/`：模型、报告和数据集版本产物
+
+## 适用对象
+
+- 需要把灯具图片自动映射到标准 SKU、材质或部件类型的团队
+- 需要把“人工审核 + 模型报价”串成可追踪流程的项目
+- 需要为模型训练、评估和回滚保留版本化证据的业务
 
 ## 安装
 
@@ -63,9 +80,9 @@ python -m image_quote_system.cli audit-annotations --status-filter all --sample-
 
 行为约束如下：
 
-- 当前 Python 进程安装了 `sam3` 且配置可用时，走 `official`。
-- 当前进程不可用但外部 bridge runtime 可用时，走 `bridge`。
-- 真实依赖缺失、checkpoint 未配置、bridge 失败或超时时，自动回退到 `placeholder`。
+- 当前 Python 进程安装了 `sam3` 且配置可用时，走 `official`
+- 当前进程不可用但外部 bridge runtime 可用时，走 `bridge`
+- 真实依赖缺失、checkpoint 未配置、bridge 失败或超时时，自动回退到 `placeholder`
 
 ### 配置项
 
@@ -246,16 +263,16 @@ python -m image_quote_system.cli export-training-version --config-dir configs --
 
 上线前至少检查以下项目：
 
-- `SAM3`：确认官方 runtime 或 bridge runtime 至少有一条真实链路可用，并完成一次 smoke run。
-- checkpoint：确认 `SAM3_CHECKPOINT`、`SAM3_MODEL_CFG`、RT-DETR 权重、LightGBM residual 模型都来自同一轮版本。
-- fallback：确认未接入真实 `SAM3` 时系统仍能回退到 `placeholder`，且不会阻塞数据准备。
-- 审核数据：检测训练只使用 `approved` 样本，禁止直接混用 `pending`。
-- 索引：catalog 更新后重新执行 `build-index`，不要在线请求时临时重建。
-- 评估：至少保留一份最近线上版本的 `baseline` 报告，新的模型必须跑 `--compare-to`。
-- 报价规则：`configs/pricing.yaml` 的规则版本要和 residual 训练数据版本对应。
-- 部署工件：确认 `artifacts/models/detector/<run>/best.pt` 或导出件、`artifacts/models/lightgbm_residual.txt`、索引元数据均存在。
-- API：如果要生产化 `serve-api`，需在外层补鉴权、限流、超时和日志，不要把默认示例服务直接暴露公网。
-- 回滚：保留上一版 detector、index、pricing config、residual model 和 baseline 报告，确保可回切。
+- `SAM3`：确认官方 runtime 或 bridge runtime 至少有一条真实链路可用，并完成一次 smoke run
+- checkpoint：确认 `SAM3_CHECKPOINT`、`SAM3_MODEL_CFG`、RT-DETR 权重、LightGBM residual 模型都来自同一轮版本
+- fallback：确认未接入真实 `SAM3` 时系统仍能回退到 `placeholder`，且不会阻塞数据准备
+- 审核数据：检测训练只使用 `approved` 样本，禁止直接混用 `pending`
+- 索引：catalog 更新后重新执行 `build-index`，不要在线请求时临时重建
+- 评估：至少保留一份最近线上版本的 `baseline` 报告，新的模型必须跑 `--compare-to`
+- 报价规则：`configs/pricing.yaml` 的规则版本要和 residual 训练数据版本对应
+- 部署工件：确认 `artifacts/models/detector/<run>/best.pt` 或导出件、`artifacts/models/lightgbm_residual.txt`、索引元数据均存在
+- API：如果要生产化 `serve-api`，需在外层补鉴权、限流、超时和日志，不要把默认示例服务直接暴露公网
+- 回滚：保留上一版 detector、index、pricing config、residual model 和 baseline 报告，确保可回切
 
 ## 测试
 
@@ -289,6 +306,7 @@ python -m pytest -q
 
 See `SAM3_COMMUNITY_SETUP.md` for the community checkpoint flow based on
 `AEmotionStudio/sam3` and local `.safetensors` loading.
+
 ## Agent API
 
 - Frontend now consumes unified agent endpoints under `/vision-api/agent/*`.
